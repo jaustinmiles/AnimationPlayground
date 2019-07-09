@@ -63,7 +63,7 @@ class TaskFormActivity : AppCompatActivity() {
         val name = what_task_edit_text.text.toString()
         val date = date_picker.text.toString()
         val time = time_picker.text.toString()
-        val task = Task(name, date, time, null, Priority.TRIVIAL)
+        val task = Task(null, name, date, time, null, Priority.TRIVIAL)
         val intent = Intent()
         intent.putParcelableArrayListExtra(TASK_PARCELABLE, arrayListOf(task))
         setResult(Activity.RESULT_OK, intent)

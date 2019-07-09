@@ -1,29 +1,47 @@
 package com.jaustinmiles.animationplayground.model
 
+import android.arch.persistence.room.ColumnInfo
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
 import android.os.Parcel
 import android.os.Parcelable
 import com.jaustinmiles.animationplayground.Priority
+import com.jaustinmiles.animationplayground.util.PriorityHelper.Companion.getIntFromPriority
+import com.jaustinmiles.animationplayground.util.PriorityHelper.Companion.getPriorityFromInt
 
-class Task(
-    val taskName: String?, private val dueDate: String?, private val dueTime: String?,
-    private val description: String?, private val priority: Priority
+@Entity
+data class Task(@PrimaryKey(autoGenerate=true) var id: Long?,
+                @ColumnInfo(name="task_name")
+                val taskName: String?,
+                @ColumnInfo(name="due_date")
+                private val dueDate: String?,
+                @ColumnInfo(name="due_time")
+                private val dueTime: String?,
+                @ColumnInfo(name="description")
+                private val description: String?,
+                private val priority: Priority
 
 ) : Parcelable {
 
+    @ColumnInfo(name="priority_value")
+    val priorityInt = getIntFromPriority(priority)
+
     constructor(parcel: Parcel) : this(
+        parcel.readLong(),
         parcel.readString(),
         parcel.readString(),
         parcel.readString(),
         parcel.readString(),
-        Priority.values()[parcel.readInt()]
+        getPriorityFromInt(parcel.readInt())
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeLong(id?: -1)
         parcel.writeString(taskName)
         parcel.writeString(dueDate)
         parcel.writeString(dueTime)
         parcel.writeString(description)
-        parcel.writeInt(priority.ordinal)
+        parcel.writeInt(getIntFromPriority(priority))
     }
 
     override fun describeContents(): Int {
@@ -39,4 +57,8 @@ class Task(
             return arrayOfNulls(size)
         }
     }
+
+
+
+
 }
