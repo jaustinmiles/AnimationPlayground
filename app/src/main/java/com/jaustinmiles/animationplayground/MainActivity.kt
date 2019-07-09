@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.DisplayMetrics
 import com.jaustinmiles.animationplayground.model.Bubble
+import com.jaustinmiles.animationplayground.model.Task
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -24,7 +25,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
 
-    private var bubbles = arrayListOf<Bubble>()
+    var bubbles = arrayListOf<Bubble>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,9 +68,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 CREATE_NEW_TASK_CODE -> {
-                    val taskName = data?.getStringExtra(TASK_NAME)
+                    val taskList = data?.getParcelableArrayListExtra<Task>(TASK_PARCELABLE)
+                    val task = taskList!![0]
                     val (height, width) = getWidthAndHeight()
-                    val bubble = BubbleManager.createBubble(this, width.toFloat(), height.toFloat(), worldManager.world, taskName)
+                    val bubble = BubbleManager.createBubble(this, width.toFloat(), height.toFloat(), worldManager.world, task!!.taskName)
                     bubbles.add(bubble)
                     canvas.addView(bubble)
                     startSimulation()

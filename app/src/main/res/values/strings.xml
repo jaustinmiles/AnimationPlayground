@@ -7,8 +7,8 @@
     <string name="what_time">HH/MM</string>
     <string name="optional_description">optional description</string>
     <string name="submit">Submit</string>
-    <string name="what_time_is_your_task_due">What time is your task due?</string>
     <string name="add_an_optional_description">Add an optional description</string>
     <string name="what_day_is_your_task_due">What day is your task due?</string>
     <string name="what_is_the_name_of_your_task">What is the name of your task?</string>
+    <string name="what_time_is_your_task_due">What time is your task due?</string>
 </resources>

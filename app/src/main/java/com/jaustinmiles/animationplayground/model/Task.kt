@@ -5,7 +5,7 @@ import android.os.Parcelable
 import com.jaustinmiles.animationplayground.Priority
 
 class Task(
-    private val taskName: String?, private val dueDate: String?, private val dueTime: String?,
+    val taskName: String?, private val dueDate: String?, private val dueTime: String?,
     private val description: String?, private val priority: Priority
 
 ) : Parcelable {

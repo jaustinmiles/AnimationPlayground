@@ -6,10 +6,13 @@ import android.graphics.Matrix;
 import android.support.design.widget.CoordinatorLayout;
 import android.view.MotionEvent;
 import android.widget.ImageView;
+import com.jaustinmiles.animationplayground.MainActivity;
 import com.jaustinmiles.animationplayground.WorldManager;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.dynamics.*;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 
 public class Bubble extends android.support.v7.widget.AppCompatTextView {
 
@@ -91,6 +94,8 @@ public class Bubble extends android.support.v7.widget.AppCompatTextView {
     @Override
     public boolean performClick() {
         ((CoordinatorLayout) getParent()).removeView(this);
+        ArrayList<Bubble> bubbles = ((MainActivity) getContext()).getBubbles();
+        bubbles.remove(this);
         world.destroyBody(this.body);
         return super.performClick();
     }
