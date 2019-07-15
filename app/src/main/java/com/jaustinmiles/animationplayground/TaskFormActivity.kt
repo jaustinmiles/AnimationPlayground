@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.jaustinmiles.animationplayground.model.Task
+import com.jaustinmiles.animationplayground.util.PriorityHelper
 import kotlinx.android.synthetic.main.activity_task_form.*
 import java.util.*
 
@@ -63,7 +64,7 @@ class TaskFormActivity : AppCompatActivity() {
         val name = what_task_edit_text.text.toString()
         val date = date_picker.text.toString()
         val time = time_picker.text.toString()
-        val task = Task(null, name, date, time, null, Priority.TRIVIAL)
+        val task = Task(null, name, date, time, null, PriorityHelper.getIntFromPriority(Priority.TRIVIAL))
         val intent = Intent()
         intent.putParcelableArrayListExtra(TASK_PARCELABLE, arrayListOf(task))
         setResult(Activity.RESULT_OK, intent)

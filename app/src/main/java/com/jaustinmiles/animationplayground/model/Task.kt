@@ -5,26 +5,21 @@ import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
 import android.os.Parcel
 import android.os.Parcelable
-import com.jaustinmiles.animationplayground.Priority
-import com.jaustinmiles.animationplayground.util.PriorityHelper.Companion.getIntFromPriority
-import com.jaustinmiles.animationplayground.util.PriorityHelper.Companion.getPriorityFromInt
 
 @Entity
 data class Task(@PrimaryKey(autoGenerate=true) var id: Long?,
                 @ColumnInfo(name="task_name")
                 val taskName: String?,
                 @ColumnInfo(name="due_date")
-                private val dueDate: String?,
+                val dueDate: String?,
                 @ColumnInfo(name="due_time")
-                private val dueTime: String?,
+                val dueTime: String?,
                 @ColumnInfo(name="description")
-                private val description: String?,
-                private val priority: Priority
+                val description: String?,
+                @ColumnInfo(name="priority_value")
+                val priority: Int
 
 ) : Parcelable {
-
-    @ColumnInfo(name="priority_value")
-    val priorityInt = getIntFromPriority(priority)
 
     constructor(parcel: Parcel) : this(
         parcel.readLong(),
@@ -32,7 +27,7 @@ data class Task(@PrimaryKey(autoGenerate=true) var id: Long?,
         parcel.readString(),
         parcel.readString(),
         parcel.readString(),
-        getPriorityFromInt(parcel.readInt())
+        parcel.readInt()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -41,7 +36,7 @@ data class Task(@PrimaryKey(autoGenerate=true) var id: Long?,
         parcel.writeString(dueDate)
         parcel.writeString(dueTime)
         parcel.writeString(description)
-        parcel.writeInt(getIntFromPriority(priority))
+        parcel.writeInt(priority)
     }
 
     override fun describeContents(): Int {

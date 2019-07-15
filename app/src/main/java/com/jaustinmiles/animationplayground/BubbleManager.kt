@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.TextView
 import com.jaustinmiles.animationplayground.model.Bubble
+import com.jaustinmiles.animationplayground.model.Task
 import org.jbox2d.dynamics.World
 import kotlin.random.Random
 
@@ -54,6 +55,35 @@ class BubbleManager {
             bubble.gravity = Gravity.CENTER_HORIZONTAL
             bubble.gravity = Gravity.CENTER_VERTICAL
             return bubble
+        }
+
+        fun createBubblesFromTasks(context: Context, width: Float, height: Float, world: World, tasks: List<Task>)
+                : ArrayList<Bubble> {
+            val bubbles = arrayListOf<Bubble>()
+            for (task in tasks) {
+                var bitmap = BitmapFactory.decodeResource(context.resources, R.mipmap.bubble)
+                val textView = TextView(context)
+                textView.text = task.taskName
+                val bounds = Rect()
+                textView.paint.getTextBounds(textView.text.toString(), 0, textView.text.length, bounds)
+                val radius = bounds.width() / 2 + 20
+                val x = Random.nextInt((width - radius).toInt())
+                val y = Random.nextInt((height - 200).toInt()) + 500
+                val bubble =
+                    Bubble(context, world, x.toFloat(), y.toFloat(), radius)
+                bubble.text = task.taskName
+                bubble.taskId = task.id ?: -1
+                bitmap = Bitmap.createScaledBitmap(bitmap,
+                    radius * 2,
+                    radius * 2,
+                    true)
+                bubble.setBmp(bitmap)
+                bubble.textAlignment = View.TEXT_ALIGNMENT_CENTER
+                bubble.gravity = Gravity.CENTER_HORIZONTAL
+                bubble.gravity = Gravity.CENTER_VERTICAL
+                bubbles.add(bubble)
+            }
+            return bubbles
         }
     }
 }

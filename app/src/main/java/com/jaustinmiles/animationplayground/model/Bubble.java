@@ -24,6 +24,7 @@ public class Bubble extends android.support.v7.widget.AppCompatTextView {
     private World world;
     private ImageView imageView;
     private int bubbleRadius;
+    private long taskId = -1;
 
     public Bubble(Context context) {
         super(context);
@@ -98,5 +99,13 @@ public class Bubble extends android.support.v7.widget.AppCompatTextView {
         bubbles.remove(this);
         world.destroyBody(this.body);
         return super.performClick();
+    }
+
+    public long getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(long taskId) {
+        this.taskId = taskId;
     }
 }

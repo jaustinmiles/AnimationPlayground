@@ -11,6 +11,8 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.DisplayMetrics
+import android.view.ViewTreeObserver
+import com.jaustinmiles.animationplayground.database.TaskDatabase
 import com.jaustinmiles.animationplayground.model.Bubble
 import com.jaustinmiles.animationplayground.model.Task
 import kotlinx.android.synthetic.main.activity_main.*
@@ -20,6 +22,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var worldManager : WorldManager
     private lateinit var animator: ValueAnimator
+    private lateinit var db: TaskDatabase
+
 
     private val sensorManager by lazy {
         getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -31,6 +35,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+
 
         createWorldOnLayout()
 
@@ -45,6 +51,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
             SensorManager.SENSOR_DELAY_GAME
         )
+
+//        startSimulation()
+    }
+
+    override fun onDestroy() {
+        TaskDatabase.destroyInstance()
+        super.onDestroy()
     }
 
     private fun createBubblesOnLongClick(): Boolean {
@@ -57,10 +70,29 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private fun createWorldOnLayout() {
         val vto = canvas.viewTreeObserver
-        vto.addOnGlobalLayoutListener {
-            val (height, width) = getWidthAndHeight()
-            if (::worldManager.isInitialized.not()) worldManager = createWorld(height, width)
+        if (vto.isAlive) {
+            vto.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    val vtoCall = canvas.viewTreeObserver
+                    if (vtoCall.isAlive) vtoCall.removeOnGlobalLayoutListener(this)
+                    val (height, width) = getWidthAndHeight()
+                    if (::worldManager.isInitialized.not()) {
+                        worldManager = createWorld(height, width)
+                    }
+                    db = TaskDatabase.getInstance(this@MainActivity)!!
+                    val tasks = db.taskDataDao().getAll()
+                    bubbles = BubbleManager.createBubblesFromTasks(
+                        this@MainActivity, width.toFloat(), height.toFloat(),
+                        worldManager.world, tasks
+                    )
+                    startSimulation()
+                }
+
+            }
+
+            )
         }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -70,11 +102,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 CREATE_NEW_TASK_CODE -> {
                     val taskList = data?.getParcelableArrayListExtra<Task>(TASK_PARCELABLE)
                     val task = taskList!![0]
-                    val (height, width) = getWidthAndHeight()
-                    val bubble = BubbleManager.createBubble(this, width.toFloat(), height.toFloat(), worldManager.world, task!!.taskName)
-                    bubbles.add(bubble)
-                    canvas.addView(bubble)
-                    startSimulation()
+                    db = TaskDatabase.getInstance(this)!!
+                    db.taskDataDao().insert(task)
+//                    val (height, width) = getWidthAndHeight()
+////                    val bubble = BubbleManager.createBubble(this, width.toFloat(), height.toFloat(),
+////                        worldManager.world, task!!.taskName)
+////                    bubbles.add(bubble)
+////                    canvas.addView(bubble)
                 }
             }
         }
