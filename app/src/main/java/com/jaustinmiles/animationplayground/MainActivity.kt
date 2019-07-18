@@ -51,9 +51,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
             SensorManager.SENSOR_DELAY_GAME
         )
-
-//        startSimulation()
     }
+
 
     override fun onDestroy() {
         TaskDatabase.destroyInstance()
@@ -76,23 +75,25 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     val vtoCall = canvas.viewTreeObserver
                     if (vtoCall.isAlive) vtoCall.removeOnGlobalLayoutListener(this)
                     val (height, width) = getWidthAndHeight()
-                    if (::worldManager.isInitialized.not()) {
-                        worldManager = createWorld(height, width)
-                    }
-                    db = TaskDatabase.getInstance(this@MainActivity)!!
-                    val tasks = db.taskDataDao().getAll()
-                    bubbles = BubbleManager.createBubblesFromTasks(
-                        this@MainActivity, width.toFloat(), height.toFloat(),
-                        worldManager.world, tasks
-                    )
+                    setupWorld(height, width)
                     startSimulation()
                 }
 
             }
-
             )
         }
 
+    }
+
+    private fun setupWorld(height: Int, width: Int) {
+        worldManager = createWorld(height, width)
+        db = TaskDatabase.getInstance(this@MainActivity)!!
+        val tasks = db.taskDataDao().getAll()
+        if (bubbles.size != 0) for (bubble in bubbles) canvas.removeView(bubble)
+        bubbles = BubbleManager.createBubblesFromTasks(
+            this@MainActivity, width.toFloat(), height.toFloat(),
+            worldManager.world, tasks
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -104,11 +105,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     val task = taskList!![0]
                     db = TaskDatabase.getInstance(this)!!
                     db.taskDataDao().insert(task)
-//                    val (height, width) = getWidthAndHeight()
-////                    val bubble = BubbleManager.createBubble(this, width.toFloat(), height.toFloat(),
-////                        worldManager.world, task!!.taskName)
-////                    bubbles.add(bubble)
-////                    canvas.addView(bubble)
+                    val (height, width) = getWidthAndHeight()
+                    setupWorld(height, width)
+                    startSimulation()
                 }
             }
         }

@@ -7,7 +7,9 @@ import android.os.Parcel
 import android.os.Parcelable
 
 @Entity
-data class Task(@PrimaryKey(autoGenerate=true) var id: Long?,
+data class Task(
+                @PrimaryKey(autoGenerate=true)
+                var id: Long?,
                 @ColumnInfo(name="task_name")
                 val taskName: String?,
                 @ColumnInfo(name="due_date")
@@ -31,7 +33,7 @@ data class Task(@PrimaryKey(autoGenerate=true) var id: Long?,
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeLong(id?: -1)
+        parcel.writeLong(id?:-1)
         parcel.writeString(taskName)
         parcel.writeString(dueDate)
         parcel.writeString(dueTime)

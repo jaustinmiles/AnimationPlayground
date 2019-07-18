@@ -34,29 +34,6 @@ class BubbleManager {
             return bubbles
         }
 
-        fun createBubble(context: Context, width: Float, height: Float, world: World, taskName: String?): Bubble {
-            var bitmap = BitmapFactory.decodeResource(context.resources, R.mipmap.bubble)
-            val textView = TextView(context)
-            textView.text = taskName
-            val bounds = Rect()
-            textView.paint.getTextBounds(textView.text.toString(), 0, textView.text.length, bounds)
-            val radius = bounds.width() / 2 + 20
-            val x = Random.nextInt((width - radius).toInt())
-            val y = Random.nextInt((height - 200).toInt()) + 500
-            val bubble =
-                Bubble(context, world, x.toFloat(), y.toFloat(), radius)
-            bubble.text = taskName
-            bitmap = Bitmap.createScaledBitmap(bitmap,
-                radius * 2,
-                radius * 2,
-                true)
-            bubble.setBmp(bitmap)
-            bubble.textAlignment = View.TEXT_ALIGNMENT_CENTER
-            bubble.gravity = Gravity.CENTER_HORIZONTAL
-            bubble.gravity = Gravity.CENTER_VERTICAL
-            return bubble
-        }
-
         fun createBubblesFromTasks(context: Context, width: Float, height: Float, world: World, tasks: List<Task>)
                 : ArrayList<Bubble> {
             val bubbles = arrayListOf<Bubble>()
@@ -72,7 +49,6 @@ class BubbleManager {
                 val bubble =
                     Bubble(context, world, x.toFloat(), y.toFloat(), radius)
                 bubble.text = task.taskName
-                bubble.taskId = task.id ?: -1
                 bitmap = Bitmap.createScaledBitmap(bitmap,
                     radius * 2,
                     radius * 2,
