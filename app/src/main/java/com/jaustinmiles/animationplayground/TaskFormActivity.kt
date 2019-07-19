@@ -7,12 +7,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import com.jaustinmiles.animationplayground.model.Task
 import com.jaustinmiles.animationplayground.util.PriorityHelper
 import kotlinx.android.synthetic.main.activity_task_form.*
 import java.util.*
 
 class TaskFormActivity : AppCompatActivity() {
+
+    var priorityInt : Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +26,19 @@ class TaskFormActivity : AppCompatActivity() {
 
         time_picker.onFocusChangeListener = View.OnFocusChangeListener(timePickerSelected())
 
+        val adapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, PRIORITY_STRINGS )
+
+        priority_selector.adapter = adapter
+        priority_selector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                priorityInt = PriorityHelper.getPriorityIntFromString(PRIORITY_STRINGS[position])
+            }
+
+        }
         submit.setOnClickListener {
             submitTaskIntent()
         }
@@ -64,7 +81,7 @@ class TaskFormActivity : AppCompatActivity() {
         val name = what_task_edit_text.text.toString()
         val date = date_picker.text.toString()
         val time = time_picker.text.toString()
-        val task = Task(UUID.randomUUID().leastSignificantBits, name, date, time, null, PriorityHelper.getIntFromPriority(Priority.TRIVIAL))
+        val task = Task(UUID.randomUUID().leastSignificantBits, name, date, time, null, priorityInt)
         val intent = Intent()
         intent.putParcelableArrayListExtra(TASK_PARCELABLE, arrayListOf(task))
         setResult(Activity.RESULT_OK, intent)

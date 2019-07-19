@@ -11,4 +11,6 @@
     <string name="what_day_is_your_task_due">What day is your task due?</string>
     <string name="what_is_the_name_of_your_task">What is the name of your task?</string>
     <string name="what_time_is_your_task_due">What time is your task due?</string>
+    <string name="mm_dd_yyyy">mm/dd/yyyy</string>
+    <string name="hh_mm">hh:mm</string>
 </resources>

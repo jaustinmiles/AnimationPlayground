@@ -20,7 +20,7 @@ abstract class TaskDatabase : RoomDatabase() {
             if (instance == null) {
                 synchronized(TaskDatabase::class) {
                     instance = Room.databaseBuilder(context.applicationContext, TaskDatabase::class.java,
-                        "tasks.db").allowMainThreadQueries().build()
+                        "tasks.db").build()
                 }
             }
             return instance

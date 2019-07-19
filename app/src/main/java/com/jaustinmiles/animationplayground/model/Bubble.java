@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 public class Bubble extends android.support.v7.widget.AppCompatTextView {
 
-    private static final float BUBBLE_RESTITUTION = 1f;
+    private static final float BUBBLE_RESTITUTION = 0.4f;
     private static final float BUBBLE_DENSITY = 1.0f;
     private static final float BUBBLE_FRICTION = 0.3f;
 
@@ -24,6 +24,7 @@ public class Bubble extends android.support.v7.widget.AppCompatTextView {
     private World world;
     private ImageView imageView;
     private int bubbleRadius;
+    private Long taskId;
 
     public Bubble(Context context) {
         super(context);
@@ -95,8 +96,13 @@ public class Bubble extends android.support.v7.widget.AppCompatTextView {
     public boolean performClick() {
         ((CoordinatorLayout) getParent()).removeView(this);
         ArrayList<Bubble> bubbles = ((MainActivity) getContext()).getBubbles();
+        ((MainActivity) getContext()).deleteTaskFromDB(this.taskId);
         bubbles.remove(this);
         world.destroyBody(this.body);
         return super.performClick();
+    }
+
+    public void setTaskId(Long taskId) {
+        this.taskId = taskId;
     }
 }

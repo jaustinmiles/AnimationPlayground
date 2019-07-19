@@ -13,9 +13,14 @@ import android.support.v7.app.AppCompatActivity
 import android.util.DisplayMetrics
 import android.view.ViewTreeObserver
 import com.jaustinmiles.animationplayground.database.TaskDatabase
+import com.jaustinmiles.animationplayground.events.TasksEvent
 import com.jaustinmiles.animationplayground.model.Bubble
 import com.jaustinmiles.animationplayground.model.Task
 import kotlinx.android.synthetic.main.activity_main.*
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
+import java.util.concurrent.Executors
 
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
@@ -23,6 +28,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var worldManager : WorldManager
     private lateinit var animator: ValueAnimator
     private lateinit var db: TaskDatabase
+
+    private val executor by lazy {
+        Executors.newSingleThreadExecutor()
+    }
 
 
     private val sensorManager by lazy {
@@ -35,8 +44,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-
-
 
         createWorldOnLayout()
 
@@ -56,6 +63,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onDestroy() {
         TaskDatabase.destroyInstance()
+        EventBus.getDefault().unregister(this)
         super.onDestroy()
     }
 
@@ -76,9 +84,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     if (vtoCall.isAlive) vtoCall.removeOnGlobalLayoutListener(this)
                     val (height, width) = getWidthAndHeight()
                     setupWorld(height, width)
-                    startSimulation()
                 }
-
             }
             )
         }
@@ -87,13 +93,26 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private fun setupWorld(height: Int, width: Int) {
         worldManager = createWorld(height, width)
-        db = TaskDatabase.getInstance(this@MainActivity)!!
-        val tasks = db.taskDataDao().getAll()
+        EventBus.getDefault().register(this)
+        executor.execute {
+            db = TaskDatabase.getInstance(this)!!
+            val tasks = db.taskDataDao().getAll()
+            EventBus.getDefault().post(TasksEvent(tasks))
+        }
+    }
+
+    @Suppress("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun tasksItemEventHandler(tasksEvent: TasksEvent) {
+        EventBus.getDefault().unregister(this)
+        val tasks = tasksEvent.tasks
         if (bubbles.size != 0) for (bubble in bubbles) canvas.removeView(bubble)
+        val (height, width) = getWidthAndHeight()
         bubbles = BubbleManager.createBubblesFromTasks(
-            this@MainActivity, width.toFloat(), height.toFloat(),
+            this, width.toFloat(), height.toFloat(),
             worldManager.world, tasks
         )
+        startSimulation()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -103,25 +122,35 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 CREATE_NEW_TASK_CODE -> {
                     val taskList = data?.getParcelableArrayListExtra<Task>(TASK_PARCELABLE)
                     val task = taskList!![0]
-                    db = TaskDatabase.getInstance(this)!!
-                    db.taskDataDao().insert(task)
+                    executor.execute{
+                        db = TaskDatabase.getInstance(this)!!
+                        db.taskDataDao().insert(task)
+                    }
                     val (height, width) = getWidthAndHeight()
                     setupWorld(height, width)
-                    startSimulation()
                 }
             }
         }
     }
 
+    fun deleteTaskFromDB(taskId: Long) {
+        executor.execute{
+            db = TaskDatabase.getInstance(this)!!
+            db.taskDataDao().delete(taskId)
+        }
+    }
+
     private fun startSimulation() {
         if (::animator.isInitialized && animator.isRunning) animator.cancel()
-        if (bubbles.size != 0) for (bubble in bubbles) canvas.removeView(bubble)
-        for (bubble in bubbles) canvas.addView(bubble)
+        for (bubble in bubbles) {
+            canvas.addView(bubble)
+        }
         animator = ValueAnimator
             .ofFloat(0f, 1000f)
-            .setDuration(100000)
+            .setDuration(10000000)
         animator.addUpdateListener { performWorldStep(worldManager) }
         animator.start()
+        animator.repeatMode = ValueAnimator.RESTART
     }
 
     private fun performWorldStep(worldManager: WorldManager) {
@@ -146,15 +175,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         return Pair(height, width)
     }
 
-    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
-
-    }
+    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {}
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
             val x = event.values[0]
             val y = event.values[2]
-            if (::worldManager.isInitialized) worldManager.setGravity(-x * 20, y * 20)
+            if (::worldManager.isInitialized) worldManager.setGravity(-x * 10, y * 10 - 40)
         }
     }
 }
