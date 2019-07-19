@@ -94,11 +94,19 @@ public class Bubble extends android.support.v7.widget.AppCompatTextView {
 
     @Override
     public boolean performClick() {
-        ((CoordinatorLayout) getParent()).removeView(this);
-        ArrayList<Bubble> bubbles = ((MainActivity) getContext()).getBubbles();
-        ((MainActivity) getContext()).deleteTaskFromDB(this.taskId);
-        bubbles.remove(this);
-        world.destroyBody(this.body);
+        if (((MainActivity) getContext()).isPoppable()) {
+            ((CoordinatorLayout) getParent()).removeView(this);
+            ArrayList<Bubble> bubbles = ((MainActivity) getContext()).getBubbles();
+            try {
+                ((MainActivity) getContext()).deleteTaskFromDB(this.taskId);
+            } catch (NullPointerException e) {
+                System.out.println("Task is not in database. Ensure this was used for testing purposes.");
+            }
+
+
+            bubbles.remove(this);
+            world.destroyBody(this.body);
+        }
         return super.performClick();
     }
 

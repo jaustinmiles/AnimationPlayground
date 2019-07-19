@@ -11,6 +11,8 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.DisplayMetrics
+import android.view.Menu
+import android.view.MenuItem
 import android.view.ViewTreeObserver
 import com.jaustinmiles.animationplayground.database.TaskDatabase
 import com.jaustinmiles.animationplayground.events.TasksEvent
@@ -28,6 +30,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var worldManager : WorldManager
     private lateinit var animator: ValueAnimator
     private lateinit var db: TaskDatabase
+    private lateinit var menu: Menu
+    var isPoppable : Boolean = false
 
     private val executor by lazy {
         Executors.newSingleThreadExecutor()
@@ -69,6 +73,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private fun createBubblesOnLongClick(): Boolean {
         val (height, width) = getWidthAndHeight()
+        for (bubble in bubbles) canvas.removeView(bubble)
         val newBubbles = BubbleManager.createBubbles(this, width.toFloat(), height.toFloat(), worldManager.world)
         for (bubble in newBubbles) bubbles.add(bubble)
         startSimulation()
@@ -130,6 +135,29 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     setupWorld(height, width)
                 }
             }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        this.menu = menu!!
+        menuInflater.inflate(R.menu.pop_bubbles_menu_item, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when (item?.itemId) {
+            R.id.action_pop -> {
+                menu.removeItem(R.id.action_pop)
+                isPoppable = true
+                menuInflater.inflate(R.menu.done_popping_menu_item, menu)
+                true}
+            R.id.action_done_pop -> {
+                menu.removeItem(R.id.action_done_pop)
+                isPoppable = false
+                menuInflater.inflate(R.menu.pop_bubbles_menu_item, menu)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
