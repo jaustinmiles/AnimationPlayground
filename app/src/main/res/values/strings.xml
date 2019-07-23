@@ -15,4 +15,9 @@
     <string name="hh_mm">hh:mm</string>
     <string name="pop_task_bubbles">Pop task bubbles!</string>
     <string name="how_important_is_your_task">How important is your task?</string>
+    <string name="all_tasks">All Tasks</string>
+    <string name="open_drawer">Open navigation drawer</string>
+    <string name="close_drawer">Close navigation drawer</string>
+    <string name="tasks">Tasks</string>
+    <string name="bubble_image">Bubble image</string>
 </resources>

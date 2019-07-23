@@ -9,6 +9,9 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.support.design.widget.NavigationView
+import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
@@ -25,7 +28,17 @@ import org.greenrobot.eventbus.ThreadMode
 import java.util.concurrent.Executors
 
 
-class MainActivity : AppCompatActivity(), SensorEventListener {
+class MainActivity : AppCompatActivity(), SensorEventListener, NavigationView.OnNavigationItemSelectedListener {
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.all_tasks -> {
+
+                true
+            }
+            else -> true
+        }
+    }
 
     private var height = 0
     private var width = 0
@@ -39,6 +52,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         Executors.newSingleThreadExecutor()
     }
 
+    private val drawerLayout by lazy {
+        findViewById<DrawerLayout>(R.id.drawer_layout)
+    }
+
     val sensorManager by lazy {
         getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
@@ -47,7 +64,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.drawer_layout_main)
         setSupportActionBar(toolbar)
 
         lifecycle.addObserver(TaskLifeCycleObserver(this))
@@ -60,6 +77,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
 
         fab.setOnLongClickListener { createBubblesOnLongClick() }
+
+        val navView = findViewById<NavigationView>(R.id.nav_view)
+        navView.setNavigationItemSelectedListener(this)
+
+        val toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open_drawer, R.string.close_drawer )
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
     }
 
 
