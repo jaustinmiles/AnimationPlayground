@@ -10,7 +10,6 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.DisplayMetrics
 import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewTreeObserver
@@ -18,6 +17,7 @@ import com.jaustinmiles.animationplayground.database.TaskDatabase
 import com.jaustinmiles.animationplayground.events.TasksEvent
 import com.jaustinmiles.animationplayground.model.Bubble
 import com.jaustinmiles.animationplayground.model.Task
+import com.jaustinmiles.animationplayground.util.DimensionHelper.Companion.getWidthAndHeight
 import kotlinx.android.synthetic.main.activity_main.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -27,6 +27,8 @@ import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
 
+    private var height = 0
+    private var width = 0
     private lateinit var worldManager : WorldManager
     private lateinit var animator: ValueAnimator
     private lateinit var db: TaskDatabase
@@ -37,8 +39,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         Executors.newSingleThreadExecutor()
     }
 
-
-    private val sensorManager by lazy {
+    val sensorManager by lazy {
         getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
 
@@ -49,6 +50,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        lifecycle.addObserver(TaskLifeCycleObserver(this))
+
         createWorldOnLayout()
 
         fab.setOnClickListener{
@@ -57,22 +60,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
 
         fab.setOnLongClickListener { createBubblesOnLongClick() }
-
-        sensorManager.registerListener(this,
-            sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-            SensorManager.SENSOR_DELAY_GAME
-        )
     }
 
-
-    override fun onDestroy() {
-        TaskDatabase.destroyInstance()
-        EventBus.getDefault().unregister(this)
-        super.onDestroy()
-    }
 
     private fun createBubblesOnLongClick(): Boolean {
-        val (height, width) = getWidthAndHeight()
         for (bubble in bubbles) canvas.removeView(bubble)
         val newBubbles = BubbleManager.createBubbles(this, width.toFloat(), height.toFloat(), worldManager.world)
         for (bubble in newBubbles) bubbles.add(bubble)
@@ -87,7 +78,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 override fun onGlobalLayout() {
                     val vtoCall = canvas.viewTreeObserver
                     if (vtoCall.isAlive) vtoCall.removeOnGlobalLayoutListener(this)
-                    val (height, width) = getWidthAndHeight()
+                    val (height, width) = getWidthAndHeight(this@MainActivity)
+                    this@MainActivity.height = height
+                    this@MainActivity.width = width
                     setupWorld(height, width)
                 }
             }
@@ -112,7 +105,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         EventBus.getDefault().unregister(this)
         val tasks = tasksEvent.tasks
         if (bubbles.size != 0) for (bubble in bubbles) canvas.removeView(bubble)
-        val (height, width) = getWidthAndHeight()
         bubbles = BubbleManager.createBubblesFromTasks(
             this, width.toFloat(), height.toFloat(),
             worldManager.world, tasks
@@ -131,7 +123,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                         db = TaskDatabase.getInstance(this)!!
                         db.taskDataDao().insert(task)
                     }
-                    val (height, width) = getWidthAndHeight()
                     setupWorld(height, width)
                 }
             }
@@ -195,13 +186,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         return WorldManager(width.toFloat(), height.toFloat(), toolbarHeight.toFloat())
     }
 
-    private fun getWidthAndHeight(): Pair<Int, Int> {
-        val displayMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
-        val height = displayMetrics.heightPixels
-        val width = displayMetrics.widthPixels
-        return Pair(height, width)
-    }
+
 
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {}
 

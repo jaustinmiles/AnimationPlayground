@@ -77,13 +77,14 @@
         app:layout_constraintTop_toBottomOf="@+id/due_date_label" />
 
     <TextView
-        android:id="@+id/due_time_label"
+        android:id="@+id/due_time_label2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="36dp"
         android:layout_marginEnd="8dp"
         android:text="@string/what_time_is_your_task_due"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/date_picker" />
@@ -93,45 +94,57 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="28dp"
         android:layout_marginEnd="8dp"
         android:autofillHints="@string/what_time_is_your_task_due"
-        android:hint="@string/hh_mm"
         android:ems="10"
+        android:hint="@string/hh_mm"
         android:inputType="time"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/due_time_label" />
+        app:layout_constraintTop_toBottomOf="@+id/due_time_label2" />
+
+    <TextView
+        android:id="@+id/how_important_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="80dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/how_important_is_your_task"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/priority_selector"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/time_picker"
+        app:layout_constraintVertical_bias="0.597" />
 
     <Spinner
         android:id="@+id/priority_selector"
         android:layout_width="207dp"
         android:layout_height="55dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="32dp"
         android:background="@android:drawable/btn_dropdown"
         android:spinnerMode="dropdown"
         app:layout_constraintBottom_toTopOf="@+id/submit"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/time_picker" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/submit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="32dp"
         android:text="@string/submit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/date_picker"
-        app:layout_constraintVertical_bias="0.774" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
