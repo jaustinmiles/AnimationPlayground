@@ -8,9 +8,10 @@ import org.jbox2d.dynamics.World;
 
 public class WorldManager {
 
-    private World world;
-    private float translate;
+    private final World world;
+    private final float translate;
 
+    @SuppressWarnings("unused")
     public WorldManager(float width, float height, float translate) {
         this.translate = translate;
         Vec2 g = new Vec2(0.0f, 20f);
@@ -61,6 +62,7 @@ public class WorldManager {
         wallBody2.createFixture(wallBox2, 1f);
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public World getWorld() {
         return this.world;
     }

@@ -17,6 +17,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewTreeObserver
 import com.jaustinmiles.animationplayground.database.TaskDatabase
+import com.jaustinmiles.animationplayground.events.TaskListActivityEvent
 import com.jaustinmiles.animationplayground.events.TasksEvent
 import com.jaustinmiles.animationplayground.model.Bubble
 import com.jaustinmiles.animationplayground.model.Task
@@ -29,16 +30,6 @@ import java.util.concurrent.Executors
 
 
 class MainActivity : AppCompatActivity(), SensorEventListener, NavigationView.OnNavigationItemSelectedListener {
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.all_tasks -> {
-
-                true
-            }
-            else -> true
-        }
-    }
 
     private var height = 0
     private var width = 0
@@ -78,12 +69,36 @@ class MainActivity : AppCompatActivity(), SensorEventListener, NavigationView.On
 
         fab.setOnLongClickListener { createBubblesOnLongClick() }
 
+        createSlidingDrawer()
+    }
+
+    private fun createSlidingDrawer() {
         val navView = findViewById<NavigationView>(R.id.nav_view)
         navView.setNavigationItemSelectedListener(this)
-
-        val toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open_drawer, R.string.close_drawer )
+        val toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open_drawer, R.string.close_drawer)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.all_tasks -> {
+                setUpTaskListActivityHandler()
+            }
+            else -> true
+        }
+    }
+
+    private fun setUpTaskListActivityHandler() : Boolean {
+        EventBus.getDefault().register(this)
+        executor.execute {
+            db = TaskDatabase.getInstance(this)!!
+            val tasks = db.taskDataDao().getAll()
+            val arrList = arrayListOf<Task>()
+            arrList.addAll(tasks)
+            EventBus.getDefault().post(TaskListActivityEvent(arrList))
+        }
+        return true
     }
 
 
@@ -135,6 +150,18 @@ class MainActivity : AppCompatActivity(), SensorEventListener, NavigationView.On
         )
         startSimulation()
     }
+
+    @Suppress("unused")
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun taskListActivityEventHandler(event: TaskListActivityEvent) {
+        EventBus.getDefault().unregister(this)
+        val tasks = event.tasks
+        val intent = Intent(this, TaskListActivity::class.java)
+        intent.putParcelableArrayListExtra(TASK_LIST_PARCELABLE, tasks)
+        startActivity(intent)
+    }
+
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

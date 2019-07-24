@@ -5,11 +5,8 @@ const val VELOCITY_ITERATIONS = 6
 const val POSITION_ITERATIONS = 2
 const val NUM_BUBBLES = 10
 const val TASK_PARCELABLE = "task_parcelable"
+const val TASK_LIST_PARCELABLE = "task_list_parcelable"
 const val CREATE_NEW_TASK_CODE = 1001
-
-enum class Priority {
-    URGENT, ESSENTIAL, IMPORTANT, TRIVIAL
-}
 
 val PRIORITY_STRINGS = arrayOf("Urgent", "Essential", "Important", "Trivial")
 

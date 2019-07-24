@@ -78,10 +78,12 @@ public class Bubble extends android.support.v7.widget.AppCompatTextView {
         imageView.setImageMatrix(matrix);
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public float getWorldX() {
         return body.getPosition().x * 20 - this.bubbleRadius;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public float getWorldY() {
         return -body.getPosition().y * 20 - this.bubbleRadius;
     }

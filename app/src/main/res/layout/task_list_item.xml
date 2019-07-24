@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="5dp"
+    android:paddingTop="5dp">
+
+    <TextView
+        android:id="@+id/list_item_task_name"
+        android:text="@string/dummy_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:textSize="20sp"/>
+
+    <TextView
+        android:id="@+id/list_item_due_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:gravity="end"
+        android:layout_marginEnd="49dp"
+        android:layout_toEndOf="@+id/list_item_task_name"
+        android:text="@string/dummy_text"
+        android:textSize="20sp"/>
+</RelativeLayout>
