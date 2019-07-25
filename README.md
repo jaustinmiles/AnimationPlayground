@@ -1,2 +1,2 @@
 # AnimationPlayground
-An app to display to-do list tasks as floating bubbles through the use of the JBox2D physics engine and the ROOM wrapper for sqlite persistent storage. 
+An app to display to-do list tasks as immersive, real-world objects through the use of the JBox2D physics engine in conjunction with Android's onboard accelerometer. This provides an interactive and dynamic priority scheduling experience, backed by Google's ROOM database management system. 
